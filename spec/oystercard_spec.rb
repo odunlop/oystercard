@@ -3,6 +3,8 @@ require "oystercard"
 describe Oystercard do
 
   let(:entry_station) {double :station}
+  let(:exit_station) {double :station}
+
 
   describe "#balance" do
     it "initially has a balance of 0" do
@@ -32,7 +34,7 @@ describe Oystercard do
   end
 
   describe "#touch_in" do
-    it { is_expected.to respond_to(:touch_in) }
+    it { is_expected.to respond_to(:touch_in).with(1).argument }
 
     it "is in journey after touching in" do
       subject.top_up(5)
@@ -52,12 +54,12 @@ describe Oystercard do
   end
 
   describe "#touch_out" do
-    it { is_expected.to respond_to(:touch_out) }
+    it { is_expected.to respond_to(:touch_out).with(1).argument }
 
     it "is not in journey after touching out" do
       subject.top_up(5)
       subject.touch_in(entry_station)
-      subject.touch_out
+      subject.touch_out(exit_station)
       expect(subject).not_to be_in_journey
     end
 
@@ -65,14 +67,28 @@ describe Oystercard do
       min_fare = Oystercard::MINIMUM_FARE
       subject.top_up(5)
       subject.touch_in(entry_station)
-      expect{ subject.touch_out }.to change{ subject.balance }.by(-min_fare)
+      expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by(-min_fare)
     end 
 
     it "forget the entry station when touching out" do
       subject.top_up(5)
       subject.touch_in(entry_station)
-      subject.touch_out
+      subject.touch_out(exit_station)
       expect(subject.entry_station).to eq nil
+    end
+  end
+
+  describe ".journeys" do
+    it "is intially an empty array" do
+      expect(subject.journeys).to be_empty
+    end
+
+    it "stores a journey after touching in" do
+      journey = {entry_station: entry_station, exit_station: exit_station}
+      subject.top_up(5)
+      subject.touch_in(entry_station)
+      subject.touch_out(exit_station)
+      expect(subject.journeys).to include journey
     end
   end
 end
