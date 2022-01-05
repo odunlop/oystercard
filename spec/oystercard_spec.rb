@@ -2,8 +2,8 @@ require "oystercard"
 
 describe Oystercard do
 
-  let(:entry_station) {double :station}
-  let(:exit_station) {double :station}
+  let(:entry_station) {double :station, name: "London Bridge", zone: 1}
+  let(:exit_station) {double :station, name: "Brixton", zone: 2}
 
 
   describe "#balance" do
@@ -46,11 +46,11 @@ describe Oystercard do
       expect { subject.touch_in(entry_station) }.to raise_error "You do not enough money on your card"
     end
 
-    it "remembers the station the user touched in at" do
-      subject.top_up(5)
-      subject.touch_in(entry_station)
-      expect(subject.entry_station).to eq entry_station
-    end
+    # it "remembers the station the user touched in at" do
+    #   subject.top_up(5)
+    #   subject.touch_in(entry_station)
+    #   expect(current_journey.entry_station).to eq entry_station
+    # end
   end
 
   describe "#touch_out" do
@@ -64,17 +64,23 @@ describe Oystercard do
     end
 
     it "deducts the minimum fare on touch out" do
-      min_fare = Oystercard::MINIMUM_FARE
+      min_fare = Journey::MINIMUM_FARE
       subject.top_up(5)
       subject.touch_in(entry_station)
       expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by(-min_fare)
     end 
 
-    it "forget the entry station when touching out" do
+    # it "deducts the penalty fare when touching out without an entry station" do
+    #   penalty = Journey::PENALTY_FARE
+    #   subject.top_up(10)
+    #   expect{ subject.touch_out(exit_station) }.to change{ subject.balance}.by(-penalty)
+    # end
+
+    it "clears current journey when tapping out" do
       subject.top_up(5)
       subject.touch_in(entry_station)
       subject.touch_out(exit_station)
-      expect(subject.entry_station).to eq nil
+      expect(subject.current_journey).to eq nil
     end
   end
 
@@ -83,12 +89,12 @@ describe Oystercard do
       expect(subject.journeys).to be_empty
     end
 
-    it "stores a journey after touching in" do
-      journey = {entry_station: entry_station, exit_station: exit_station}
-      subject.top_up(5)
-      subject.touch_in(entry_station)
-      subject.touch_out(exit_station)
-      expect(subject.journeys).to include journey
-    end
+    # it "stores a journey after touching in" do
+    #   journey = {entry_station: entry_station, exit_station: exit_station}
+    #   subject.top_up(5)
+    #   subject.touch_in(entry_station)
+    #   subject.touch_out(exit_station)
+    #   expect(subject.journeys).to include journey
+    # end
   end
 end
