@@ -1,7 +1,7 @@
 # Oystercard - Pairing Challenge
 
 ## Purpose
-Made using Ruby 3.0 - this code was written to complete Week 4's pairing challenge - **Oystercard** which aimed to stretch our skills in TDD, Ruby and object-oriented design.
+Made using Ruby 3.0.0 - this code was written to complete Week 4's pairing challenge - **Oystercard** which aimed to stretch our skills in TDD, Ruby and object-oriented design.
 
 ## User Stories
 ```
